@@ -2,56 +2,55 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using CodeMonkey;
-using CodeMonkey.Utils;
 
 public class FinalGraph : MonoBehaviour
 {
+    public static FinalGraph instance;
     private Window_Graph windowGraph;
     private FinalScript finalScript;
     private GameObject windowCanvas;
     [SerializeField] private float timerOneSecond, timerOneMinute;
-    [SerializeField] private bool startWork;
+    public bool startGraph, viewGraph;
     private void Awake() {
-        startWork = false;
+        instance = this;
         Setup();
+        startGraph = false;
+        viewGraph = false;
     }
     public void Setup() {
-        windowCanvas = GameObject.Find("Canvas");
+        windowCanvas = GameObject.Find("GraphCanvas");
         finalScript = GetComponent<FinalScript>();
-        windowGraph = transform.Find("Canvas/pfWindow_Graph").GetComponent<Window_Graph>();
+        windowGraph = transform.Find("GraphCanvas/pfWindow_Graph").GetComponent<Window_Graph>();
         windowGraph.SetGetAxisLabelX((int _i) => {
-            string minuteString = _i.ToString();
-            return minuteString + " minutes";
+            string minuteString = _i + " minutes";
+            return minuteString;
         });
     }
     public void Update() {
-        // if (Input.GetKeyDown(KeyCode.Z)) {
-        //     startWork = !startWork;
-        // }
-        // if (startWork == true) {
-        //     timerOneSecond += Time.deltaTime;
-        //     timerOneMinute += Time.deltaTime;
-        //     if (timerOneSecond > 1) {
-        //         windowGraph.ShowGraph(finalScript.submitCountList);
-        //         finalScript.OnAddSubmit += SubmitLog_OnAddSubmit;
-        //         finalScript.OnNewMinute += SubmitLog_OnNewMinute;
-        //         timerOneSecond = 0;
-        //     }
-        //     if (timerOneMinute > 60) {
-        //         FinalScript.instance.Clock_OnNewMinute();
-        //         timerOneMinute = 0;
-        //     }
-        // }
+        if (Input.GetKeyDown(KeyCode.Z)) {
+            startGraph = !startGraph;
+        }
+        if (startGraph == true) {
+            timerOneMinute += Time.deltaTime;
+            if (timerOneMinute > 60) {
+                FinalScript.instance.Clock_OnNewMinute();
+                timerOneMinute = 0;
+            }
+        }
         if (Input.GetKeyDown(KeyCode.X))
         {
-            Show();
+            viewGraph = !viewGraph;
         }
-        if (Input.GetKeyDown(KeyCode.C))
+        if (viewGraph)
         {
-            Hide();
+            timerOneSecond += Time.deltaTime;
+            if (timerOneSecond > 1)
+            {
+                Show();
+                timerOneSecond = 0;
+            }
         }
+        else Hide();
     }
     public void Show() {
         windowCanvas.gameObject.SetActive(true);

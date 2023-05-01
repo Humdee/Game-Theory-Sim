@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class DevScript : MonoBehaviour
 {
-    [SerializeField] private bool startWork;
-    [SerializeField] private float randomTak, randomMan, randomSub, timer;
+    public bool startWork;
+    [SerializeField] private float randomTak, randomMan, randomSub, randomNex, timer;
     public float randomGen;
     public List<GameObject> DevWorkList;
     void Start() {
@@ -13,6 +13,7 @@ public class DevScript : MonoBehaviour
         randomTak = Mathf.Round(Random.value * 10f);
         randomMan = Mathf.Round(Random.value * 10f);
         randomSub = Mathf.Round(Random.value * 10f);
+        randomNex = Mathf.Round(Random.value * 10f);
     }
     void Update() {
         timer += Time.deltaTime;
@@ -22,7 +23,7 @@ public class DevScript : MonoBehaviour
             StartWork();
         }
     }
-    void StartWork() {
+    public void StartWork() {
         if (startWork == true)
         {
             Invoke("TakeWork", randomTak);
@@ -52,10 +53,13 @@ public class DevScript : MonoBehaviour
             GameObject work = DevWorkList[0];
             DoneScript.instance.DoneList.Add(work);
             DevWorkList.RemoveAt(0);
-            if (startWork == true)
+            Invoke("NextWork", randomNex);
+        }
+    }
+    void NextWork() {
+        if (startWork == true)
             {
                 Invoke("TakeWork", randomTak);
             }
-        }
     }
 }
