@@ -8,23 +8,24 @@ public class FinalGraph : MonoBehaviour
     public static FinalGraph instance;
     private Window_Graph windowGraph;
     private FinalScript finalScript;
-    private GameObject windowCanvas;
-    [SerializeField] private float timerOneSecond, timerOneMinute;
+    [SerializeField] private float timerOneMinute;
     public bool startGraph, viewGraph;
-    private void Awake() {
+    void Awake() {
         instance = this;
         Setup();
+    }
+    void Start() {
         startGraph = false;
         viewGraph = false;
     }
     public void Setup() {
-        windowCanvas = GameObject.Find("GraphCanvas");
         finalScript = GetComponent<FinalScript>();
         windowGraph = transform.Find("GraphCanvas/pfWindow_Graph").GetComponent<Window_Graph>();
         windowGraph.SetGetAxisLabelX((int _i) => {
             string minuteString = _i + " minutes";
             return minuteString;
         });
+        Hide();
     }
     public void Update() {
         if (Input.GetKeyDown(KeyCode.Z)) {
@@ -33,8 +34,13 @@ public class FinalGraph : MonoBehaviour
         if (startGraph == true) {
             timerOneMinute += Time.deltaTime;
             if (timerOneMinute > 60) {
-                FinalScript.instance.Clock_OnNewMinute();
+                finalScript.Clock_OnNewMinute();
                 timerOneMinute = 0;
+            }
+            if (Input.GetKeyDown(KeyCode.C)) {
+                viewGraph = !viewGraph;
+                Invoke("testInvoke1", 1);
+                Invoke("testInvoke2", 1);
             }
         }
         if (Input.GetKeyDown(KeyCode.X))
@@ -43,18 +49,14 @@ public class FinalGraph : MonoBehaviour
         }
         if (viewGraph)
         {
-            timerOneSecond += Time.deltaTime;
-            if (timerOneSecond > 1)
-            {
-                Show();
-                timerOneSecond = 0;
-            }
+            Show();
         }
         else Hide();
     }
+    public void testInvoke1() {finalScript.Clock_OnNewMinute();}
+    public void testInvoke2() {viewGraph = !viewGraph;}
     public void Show() {
-        windowCanvas.gameObject.SetActive(true);
-        finalScript = GetComponent<FinalScript>();
+        windowGraph.gameObject.SetActive(true);
         windowGraph.ShowGraph(finalScript.submitCountList);
         finalScript.OnAddSubmit += SubmitLog_OnAddSubmit;
         finalScript.OnNewMinute += SubmitLog_OnNewMinute;
@@ -66,7 +68,7 @@ public class FinalGraph : MonoBehaviour
         windowGraph.UpdateValue(finalScript.submitCountList.Count - 1, finalScript.submitCountList[finalScript.submitCountList.Count - 1]);
     }
     public void Hide() {
-        windowCanvas.gameObject.SetActive(false);
+        windowGraph.gameObject.SetActive(false);
         finalScript.OnAddSubmit -= SubmitLog_OnAddSubmit;
         finalScript.OnNewMinute -= SubmitLog_OnNewMinute;
     }

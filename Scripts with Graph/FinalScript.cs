@@ -19,8 +19,10 @@ public class FinalScript : MonoBehaviour
     }
     public void Clock_OnNewMinute() {
         submitCountList.Add(0);
+        Clock_OnNewMinute_Custom();
         if (OnNewMinute != null) OnNewMinute(this, EventArgs.Empty);
     }
+    public void Clock_OnNewMinute_Custom() {}
     public void AddSubmit() {
         submitCountList[submitCountList.Count - 1]++;
         if (OnAddSubmit != null) OnAddSubmit(this, EventArgs.Empty);

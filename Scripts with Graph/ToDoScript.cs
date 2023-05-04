@@ -23,6 +23,10 @@ public class ToDoScript : MonoBehaviour
             CreateBunchWork();
         }
     }
+    public void CreateOneWork() {
+        GameObject work = Instantiate(WorkPrefab);
+        ToDoList.Add(work);
+    }
     private void CreateBunchWork() {
         while (Create50work < 50)
         {

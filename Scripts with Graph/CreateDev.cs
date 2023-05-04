@@ -10,11 +10,14 @@ public class CreateDev : MonoBehaviour
     void Awake() {
         instance = this;
     }
-    private void Update() {
+    void Update() {
         if (Input.GetKeyDown(KeyCode.S))
         {
-            GameObject dev = Instantiate(devPrefab);
-            DevList.Add(dev);
+            CreateOneDev();
         }
+    }
+    public void CreateOneDev() {
+        GameObject dev = Instantiate(devPrefab);
+        DevList.Add(dev);
     }
 }
