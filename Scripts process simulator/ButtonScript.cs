@@ -8,13 +8,17 @@ using TMPro;
 
 public class ButtonScript : MonoBehaviour
 {
-    public List<GameObject> DevListToStart, DevListToStrat;
+    public static ButtonScript instance;
+    public List<GameObject> DevListToStart, DevListToStrat, DevListToChangeStrat;
     private TMP_Text startWorkBtnText, showGraphBtntext;
-    private TMP_Text devSliderText, workSliderText, timeSliderText, startStrategyText, testerSliderText;
-    private string strat;
-    public Slider devSlider, workSlider, timeSlider;
+    private TMP_Text devSliderText, workSliderText, timeSliderText, startStrategyText, testerSliderText, avrgWorkTimeText;
+    public string strat;
+    public Slider devSlider, workSlider, timeSlider, avrgWorkTimeSlider;
     public GameObject[] tabs;
     public int[] graphArray;
+    private void Awake() {
+        instance = this;
+    }
     private void Start() {
         startWorkBtnText = transform.Find("StartWorkButton/StartButtonText").GetComponent<TMP_Text>();
         showGraphBtntext = transform.Find("ShowGraphButton/GraphButtonText").GetComponent<TMP_Text>();
@@ -27,6 +31,8 @@ public class ButtonScript : MonoBehaviour
         workSliderText = transform.Find("TAB/Tabs/Tab1/WorkSlider/WorkSliderText").GetComponent<TMP_Text>();
         timeSlider = transform.Find("TimeSlider").GetComponent<Slider>();
         timeSliderText = transform.Find("TimeSlider/TimeSliderText").GetComponent<TMP_Text>();
+        avrgWorkTimeSlider = transform.Find("TAB/Tabs/Tab1/AverageTimeSlider").GetComponent<Slider>();
+        avrgWorkTimeText = transform.Find("TAB/Tabs/Tab1/AverageTimeSlider/AverageTimeText").GetComponent<TMP_Text>();
 
         for (int i = 0; i < tabs.Length; i++)
         {
@@ -34,6 +40,7 @@ public class ButtonScript : MonoBehaviour
         } tabs[0].SetActive(true);
     }
     public void OnStartWorkButtonPressed() {
+        changeStartStrategy();
         DevListToStart = CreateDev.instance.DevList;
         foreach (GameObject dev in DevListToStart)
         {
@@ -47,6 +54,9 @@ public class ButtonScript : MonoBehaviour
         } else startWorkBtnText.text = "Start work";
         Clock.instance.startWork = !Clock.instance.startWork;
     }
+    public void OnResetButtonPressed() {
+        ScenesManager.instance.LoadScene(ScenesManager.Scene.SimulationScene);
+    }
     public void OnShowGraphButtonPressed() {
         FinalGraph.instance.viewGraph = !FinalGraph.instance.viewGraph;
         if (FinalGraph.instance.viewGraph)
@@ -57,7 +67,8 @@ public class ButtonScript : MonoBehaviour
     public void OnCreateButtonPressed() {
         int devToCreate = Mathf.RoundToInt(devSlider.value);
         for (int i = 0; i < devToCreate; i++) {
-            CreateDev.instance.CreateOneDev();
+            // CreateDev.instance.CreateOneDev();
+            CreateDev.instance.CreateOneSpriteDev();
         }
         int workToCreate = Mathf.RoundToInt(workSlider.value);
         for (int j = 0; j < workToCreate; j++) {
@@ -89,6 +100,25 @@ public class ButtonScript : MonoBehaviour
             }
         } else Debug.Log("Hehehe Wrong Start Strategy");
         startStrategyText.text = strat;
+    }
+    public void changeStartStrategy() {
+        DevListToChangeStrat = CreateDev.instance.DevList;
+        if (strat == "Start Fix") {
+            foreach (GameObject dev in DevListToChangeStrat)
+            {
+                dev.GetComponent<DevScript>().DevStrat = "Fix";
+            }
+        } else if (strat == "Start Kludge") {
+            foreach (GameObject dev in DevListToChangeStrat)
+            {
+                dev.GetComponent<DevScript>().DevStrat = "Kludge";
+            }
+        } else if (strat == "Start Random") {
+            foreach (GameObject dev in DevListToChangeStrat)
+            {
+                dev.GetComponent<DevScript>().DevStrat = "Random";
+            }
+        } else Debug.Log("Hehehe can't change Strategy");
     }
     public void UpdateDevSliderText() {
         devSliderText.text = devSlider.value.ToString() + " Devs";
@@ -125,5 +155,9 @@ public class ButtonScript : MonoBehaviour
             FinalGraph.instance.Hide();
             showGraphBtntext.text = "Hide Graph";
         }
+    }
+    public void UpdateAvrgWorkTimeSlider() {
+        avrgWorkTimeText.text = avrgWorkTimeSlider.value.ToString() + " minute average work";
+        NormalScript.instance.mean = avrgWorkTimeSlider.value;
     }
 }

@@ -10,7 +10,7 @@ public class Clock : MonoBehaviour
     private const float real_second_per_ingame_Hour = 3600f;
     public bool startWork;
     private float hour;
-    private TMP_Text timeText;
+    public TMP_Text timeText;
     private void Awake() {
         instance = this;
         timeText = transform.GetComponent<TMP_Text>();

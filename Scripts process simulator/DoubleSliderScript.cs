@@ -6,11 +6,13 @@ using TMPro;
 
 public class DoubleSliderScript : MonoBehaviour
 {
+    public static DoubleSliderScript instance;
     public Slider sliderMin, sliderMax;
     private TMP_Text doubleSliderText;
     private string min, max;
     private float bothDistance;
     private void Awake() {
+        instance = this;
         sliderMin = transform.Find("_sliderMin").GetComponent<Slider>();
         sliderMax = transform.Find("_sliderMax").GetComponent<Slider>();
         doubleSliderText = transform.Find("DoubleSliderText").GetComponent<TMP_Text>();
@@ -40,6 +42,6 @@ public class DoubleSliderScript : MonoBehaviour
         TesterScript.instance.kludgeProb = sliderMax.value;
     }
     private void UpdateSliderText() {
-        doubleSliderText.text = min + ":" + max + " Rework Ratio";
+        doubleSliderText.text = min + "0 : " + max + "0 Rework %";
     }
 }

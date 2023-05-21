@@ -5,6 +5,7 @@ using TMPro;
 
 public class LoginScript : MonoBehaviour
 {
+    private string username;
     private TMP_Text showNaviText;
     private bool showNavi;
     private void Start() {
@@ -12,8 +13,14 @@ public class LoginScript : MonoBehaviour
         showNavi = false;
     }
     public void OnLoginButtonPressed() {
-        ScenesManager.instance.LoadNextScene();
+        if (username != null) {
+            PlayerPrefs.SetString("Username", username);
+            ScenesManager.instance.LoadNextScene();
+        } else Debug.Log("Username empty!");
         // ScenesManager.instance.LoadScene(ScenesManager.Scene.Synopsis);
+    }
+    public void ReadUsername(string s) {
+        username = s;
     }
     public void OnNaviBarPressed() {
         showNavi = !showNavi;

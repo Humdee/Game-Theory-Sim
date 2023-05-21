@@ -26,6 +26,7 @@ public class ToDoScript : MonoBehaviour
     public void CreateOneWork() {
         GameObject work = Instantiate(WorkPrefab);
         ToDoList.Add(work);
+        WorkCounter.instance.addWork();
     }
     private void CreateBunchWork() {
         while (Create50work < 50)

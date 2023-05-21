@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class DevScript : MonoBehaviour
 {
@@ -8,16 +9,29 @@ public class DevScript : MonoBehaviour
     [SerializeField] private float randomTak, randomMan, randomSub, randomNex, repeatTimer;
     public string DevStrat;
     public bool isKludging, isFixing;
+    private bool isWalkTodo, isWalkDone;
     public List<GameObject> DevWorkList;
+    [SerializeField] private SpriteRenderer sr;
+    [SerializeField] NavMeshAgent navSelf;
+    [SerializeField] private GameObject todo, done;
+    [SerializeField] private Transform todoPoint, donePoint;
     void Start() {
+        navSelf = GetComponent<NavMeshAgent>();
+        sr = transform.Find("sr").GetComponent<SpriteRenderer>();
         startWork = false;
         isKludging = false;
         isFixing = true;
         DevStrat = "Fix";
-        randomTak = Mathf.Round(Random.Range(5f, 10f));
-        randomMan = Mathf.Round(Random.Range(5f, 10f));
-        randomSub = Mathf.Round(Random.Range(5f, 10f));
-        randomNex = Mathf.Round(Random.Range(5f, 10f));
+        randomTak = Mathf.Round(NormalScript.instance.GenerateRandomNumber());
+        randomMan = Mathf.Round(NormalScript.instance.GenerateRandomNumber());
+        randomSub = Mathf.Round(NormalScript.instance.GenerateRandomNumber());
+        randomNex = Mathf.Round(NormalScript.instance.GenerateRandomNumber());
+        isWalkTodo = false;
+        isWalkDone = false;
+        todo = GameObject.Find("ToDoEnv");
+        todoPoint = todo.transform;
+        done = GameObject.Find("DoneEnv");
+        donePoint = done.transform;
     }
     void Update() {
         repeatTimer -= Time.deltaTime;
@@ -25,6 +39,16 @@ public class DevScript : MonoBehaviour
         {
             startWork = !startWork;
             StartWork();
+        }
+        if (isWalkTodo == true && isWalkDone == false)
+        {
+            GetComponent<RandomMovement>().enabled = false;
+            gotoTodo();
+        }
+        if (isWalkDone == true && isWalkTodo == false)
+        {
+            GetComponent<RandomMovement>().enabled = false;
+            gotoDone();
         }
     }
     void timer() {
@@ -78,6 +102,8 @@ public class DevScript : MonoBehaviour
         }
     }
     void TakeWork() {
+        isWalkTodo = true;
+        isWalkDone = false;
         if (ToDoScript.instance.ToDoList.Count > 0)
         {
             GameObject work = ToDoScript.instance.ToDoList[0];
@@ -98,6 +124,8 @@ public class DevScript : MonoBehaviour
         }
     }
     void SubmitWork() {
+        isWalkTodo = false;
+        isWalkDone = true;
         if (DevWorkList.Count > 0)
         {
             GameObject work = DevWorkList[0];
@@ -115,4 +143,31 @@ public class DevScript : MonoBehaviour
                 Invoke("TakeWork", randomTak);
             }
     }
+    void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.tag == "station")
+        {
+            freeRoam();
+        }
+    }
+    void freeRoam() {
+        resetPath();
+        isWalkTodo = false;
+        isWalkDone = false;
+        GetComponent<RandomMovement>().enabled = true;
+    }
+    void gotoTodo() {navSelf.speed = 10; navSelf.destination = todoPoint.position; faceCheck();}
+    void gotoDone() {navSelf.speed = 10; navSelf.destination = donePoint.position; faceCheck();}
+    void resetPath() {navSelf.isStopped = true; navSelf.ResetPath(); navSelf.speed = 3.5f; navSelf.isStopped = false;}
+    void faceCheck() {
+        float xMovement = navSelf.velocity.x;
+        if (xMovement != 0 && xMovement < 0) {
+            sr.flipX = true;
+        } else if (xMovement != 0 && xMovement > 0) {
+            sr.flipX = false;
+        }
+    }
 }
+// randomTak = Mathf.Round(Random.Range(5f, 10f));
+// randomMan = Mathf.Round(Random.Range(5f, 10f));
+// randomSub = Mathf.Round(Random.Range(5f, 10f));
+// randomNex = Mathf.Round(Random.Range(5f, 10f));
